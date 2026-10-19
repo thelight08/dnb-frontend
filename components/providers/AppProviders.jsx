@@ -9,17 +9,18 @@ import StellarProvider from "@/components/stellar/StellarProvider";
 import AdminIdleGuard from "@/components/auth/AdminIdleGuard";
 import MaintenanceGate from "@/components/maintenance/MaintenanceGate";
 import EmergencyBroadcastBanner from "@/components/broadcast/EmergencyBroadcastBanner";
-import AdminIdleGuard from "@/components/auth/AdminIdleGuard";
 import AdminShortcutsProvider from "@/components/admin/AdminShortcutsProvider";
+import { MediaBlurProvider } from "@/contexts/MediaBlurContext";
 
 export default function AppProviders({ children }) {
   return (
     <ThemeProvider>
       <AppearanceProvider>
-        <CacheProvider>
-          <AuthProvider>
-            <FeatureFlagProvider>
-              <StellarProvider>
+        <MediaBlurProvider>
+          <CacheProvider>
+            <AuthProvider>
+              <FeatureFlagProvider>
+                <StellarProvider>
                 {/* Idle-timeout auto-logout for admin sessions (#337).
                     Self-noops for non-admins and non-admin routes. */}
                 <AdminIdleGuard />
@@ -36,19 +37,16 @@ export default function AppProviders({ children }) {
                  * public state and stay in sync within a session.
                  */}
                 <EmergencyBroadcastBanner />
-                <MaintenanceGate>{children}</MaintenanceGate>
-                {/* Idle-timeout auto-logout for admin sessions (#337).
-                    Self-noops for non-admins and non-admin routes. */}
-                <AdminIdleGuard />
                 {/* Power-admin keyboard shortcut layer (#336). Chord shortcuts
                     (g→key) + `?` cheatsheet; self-noops off admin routes and
                     for non-admins, and defers ⌘K to the CommandPalette. */}
                 <AdminShortcutsProvider />
-                {children}
-              </StellarProvider>
-            </FeatureFlagProvider>
-          </AuthProvider>
-        </CacheProvider>
+                <MaintenanceGate>{children}</MaintenanceGate>
+                </StellarProvider>
+              </FeatureFlagProvider>
+            </AuthProvider>
+          </CacheProvider>
+        </MediaBlurProvider>
       </AppearanceProvider>
     </ThemeProvider>
   );
