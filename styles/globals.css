@@ -135,6 +135,12 @@
     outline: 2px solid var(--ring);
     outline-offset: 2px;
   }
+  /* WCAG 2.4.7 – High-contrast focus ring override for dark mode admin chrome.
+     The default ring color is too low-contrast on dark backgrounds; a white
+     ring is immediately visible against any dark surface. */
+  .dark :focus-visible {
+    outline-color: oklch(0.985 0 0);
+  }
 }
 
 @theme {
@@ -322,3 +328,153 @@ html[dir="rtl"] body {
   font-family: var(--font-arabic), var(--font-geist-sans), ui-sans-serif,
     system-ui, sans-serif;
 }
+
+/* ─── Media Blur Gate (#268) ─────────────────────────────────────────── */
+/*
+ * When the user has opted into reduced-motion via their OS we strip all
+ * blur/transition utilities from media-blur containers so the UI stays
+ * calm and accessible.
+ */
+@media (prefers-reduced-motion: reduce) {
+  .group\/media-blur [data-slot="image"],
+  .group\/media-blur img,
+  .group\/media-blur video {
+    filter: none !important;
+    transition: none !important;
+  }
+}
+
+/* WCAG 2.4.1 – Skip navigation link. Visually hidden until focused. */
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  z-index: 999;
+  padding: 0.5rem 1rem;
+  background: var(--color-primary);
+  color: var(--primary-foreground);
+  font-weight: 600;
+  text-decoration: none;
+  border-radius: 0.375rem;
+}
+.skip-link:focus {
+  left: 1rem;
+  top: 1rem;
+}
+
+/* WCAG 1.4.11 – Focus ring for dark admin chrome elements.
+   Overrides the default ring color on dark surfaces for contrast. */
+.dark [data-slot="table-row"]:focus-visible {
+  outline-color: oklch(0.985 0 0);
+}
+.dark button:focus-visible {
+  outline-color: oklch(0.985 0 0);
+}
+.dark a:focus-visible {
+  outline-color: oklch(0.985 0 0);
+}
+
+/* ─── Print Stylesheet (#338) ────────────────────────────────────────── */
+@media print {
+  @page {
+    size: auto;
+    margin: 12mm 15mm;
+  }
+
+  html,
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+    font-size: 11pt !important;
+    line-height: 1.4 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Hide Admin Chrome and Non-Printable Elements */
+  .no-print,
+  nav,
+  header,
+  footer,
+  aside,
+  button:not(.print-keep),
+  .skip-link,
+  [data-slot="popover-content"],
+  [role="dialog"] > button[aria-label*="Close"],
+  .border-b.bg-muted\/40 button {
+    display: none !important;
+  }
+
+  /* Print Root Container Formatting */
+  .print-root {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+    border: none !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+
+  /* Cards & Sections Print Formatting */
+  .print-root .card,
+  .print-root [class*="Card"] {
+    break-inside: avoid;
+    border: 1px solid #d1d5db !important;
+    box-shadow: none !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+    margin-bottom: 1rem !important;
+    padding: 1rem !important;
+  }
+
+  /* Make URLs visible for printed links */
+  .print-root a[href]:after,
+  a.print-url[href]:after {
+    content: " (" attr(href) ")";
+    font-size: 85%;
+    font-family: var(--font-mono, monospace);
+    word-break: break-all;
+    color: #4b5563;
+  }
+
+  .print-root a[href^="#"]:after,
+  .print-root a[href^="javascript:"]:after {
+    content: "";
+  }
+
+  /* Dialog Modal Print Formatting */
+  [role="dialog"] {
+    position: absolute !important;
+    inset: 0 !important;
+    max-width: 100% !important;
+    width: 100% !important;
+    max-height: none !important;
+    height: auto !important;
+    overflow: visible !important;
+    box-shadow: none !important;
+    border: none !important;
+    background: #ffffff !important;
+  }
+
+  /* Tables & Badges Print Formatting */
+  table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+  }
+
+  th,
+  td {
+    border: 1px solid #e5e7eb !important;
+    padding: 6px 8px !important;
+  }
+
+  .badge,
+  [class*="Badge"] {
+    border: 1px solid #9ca3af !important;
+    color: #000000 !important;
+    background: #f3f4f6 !important;
+  }
+}
+
